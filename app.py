@@ -1,23 +1,6 @@
-import os
-
 import streamlit as st
-from dotenv import load_dotenv
 
 from agent import build_graph
-
-
-load_dotenv()
-
-# Local mode uses .env.
-# Streamlit Cloud mode can use st.secrets later.
-try:
-    if "OPENAI_API_KEY" in st.secrets:
-        os.environ["OPENAI_API_KEY"] = st.secrets["OPENAI_API_KEY"]
-
-    if "OPENAI_MODEL" in st.secrets:
-        os.environ["OPENAI_MODEL"] = st.secrets["OPENAI_MODEL"]
-except Exception:
-    pass
 
 
 st.set_page_config(
@@ -26,59 +9,99 @@ st.set_page_config(
     layout="wide",
 )
 
-st.title("📈 AI Stock Research Agent")
 
-st.write(
-    "Enter a stock ticker and generate a structured tension-point research brief "
-    "using SEC EDGAR data, Yahoo Finance market data, recent news headlines, "
-    "LangGraph, and GPT-4o."
-)
+@st.cache_resource
+def get_research_graph():
+    """Build the LangGraph workflow once and reuse it."""
+    return build_graph()
 
-ticker = st.text_input("Stock ticker", value="AAPL").upper().strip()
 
-run_button = st.button("Run Research Agent")
+def display_research_brief(brief) -> None:
+    """Display the completed stock research brief."""
+    st.header(f"{brief.company_name} ({brief.ticker})")
 
-if run_button:
-    if not ticker:
-        st.error("Please enter a ticker symbol.")
-    else:
-        with st.spinner(f"Researching {ticker}..."):
-            try:
-                graph = build_graph()
+    recommendation_column, conviction_column = st.columns(2)
+
+    with recommendation_column:
+        st.metric("Recommendation", brief.recommendation)
+
+    with conviction_column:
+        st.metric("Conviction", brief.conviction)
+
+    st.subheader("Fundamental Snapshot")
+    st.write(brief.fundamental_snapshot)
+
+    st.subheader("Key Valuation Debates")
+
+    for index, tension_point in enumerate(brief.tension_points, start=1):
+        with st.expander(
+            f"Tension Point {index}: {tension_point.debate}",
+            expanded=True,
+        ):
+            bull_column, bear_column = st.columns(2)
+
+            with bull_column:
+                st.markdown("### Bull Case")
+                st.write(tension_point.bull_case)
+
+            with bear_column:
+                st.markdown("### Bear Case")
+                st.write(tension_point.bear_case)
+
+            st.markdown("### What to Watch")
+            st.write(tension_point.what_to_watch)
+
+    st.subheader("Final Verdict")
+    st.info(brief.final_verdict)
+
+
+def main() -> None:
+    """Run the Streamlit application."""
+    st.title("📈 AI Stock Research Agent")
+
+    st.write(
+        "Generate a structured equity research brief using SEC filings, "
+        "Yahoo Finance market data, recent headlines, and AI analysis."
+    )
+
+    ticker = st.text_input(
+        "Enter a stock ticker",
+        placeholder="AAPL, NVDA, MSFT, TSLA",
+        max_chars=10,
+    ).strip().upper()
+
+    research_button = st.button(
+        "Generate Research Brief",
+        type="primary",
+        use_container_width=True,
+    )
+
+    if research_button:
+        if not ticker:
+            st.warning("Enter a valid stock ticker before continuing.")
+            return
+
+        try:
+            with st.spinner(
+                f"Researching {ticker} and generating the investment brief..."
+            ):
+                graph = get_research_graph()
                 result = graph.invoke({"ticker": ticker})
                 brief = result["research_brief"]
 
-                st.subheader(
-                    f"Tension Point Analysis: {brief.company_name} ({brief.ticker})"
-                )
+            display_research_brief(brief)
 
-                col1, col2 = st.columns(2)
-                col1.metric("Recommendation", brief.recommendation)
-                col2.metric("Conviction", brief.conviction)
+        except Exception as error:
+            st.error("The research brief could not be generated.")
+            st.exception(error)
 
-                st.markdown("## Fundamental Snapshot")
-                st.write(brief.fundamental_snapshot)
+    st.divider()
 
-                st.markdown("## Tension Points")
-                for i, tp in enumerate(brief.tension_points, 1):
-                    with st.expander(
-                        f"Tension Point #{i}: {tp.debate}",
-                        expanded=True,
-                    ):
-                        st.markdown("**Bull Case**")
-                        st.write(tp.bull_case)
+    st.caption(
+        "Educational portfolio project only. This application does not provide "
+        "financial or investment advice."
+    )
 
-                        st.markdown("**Bear Case**")
-                        st.write(tp.bear_case)
 
-                        st.markdown("**What to Watch**")
-                        st.write(tp.what_to_watch)
-
-                st.markdown("## Final Verdict")
-                st.write(brief.final_verdict)
-
-                st.caption("Educational research only. Not financial advice.")
-
-            except Exception as error:
-                st.error("The agent failed to run.")
-                st.code(str(error))
+if __name__ == "__main__":
+    main()
