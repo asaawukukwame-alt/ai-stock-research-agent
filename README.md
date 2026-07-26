@@ -2,6 +2,10 @@
 
 An AI-powered stock research application that generates structured equity research briefs from public financial data, market data, and recent news headlines.
 
+## Demo Screenshot
+
+![AI Stock Research Agent demo](assets/app-demo-overview.jpg)
+
 ## Project Overview
 
 This project takes a stock ticker symbol and produces a structured investment research brief.
