@@ -1,16 +1,14 @@
 # AI Stock Research Agent
 
-An AI-powered stock research application that generates structured equity research briefs from public financial data, market data, and recent news headlines.
+A Python and LangGraph application that generates structured equity research briefs from public company data, market data, recent news headlines, and GPT-4o analysis.
 
-## Demo Screenshot
+This project is designed as a portfolio-ready AI application showing practical experience with API integration, structured LLM output, workflow orchestration, and Streamlit app development.
 
-![AI Stock Research Agent demo](assets/app-demo-overview.jpg)
+## What the App Does
 
-## Project Overview
+The user enters a stock ticker such as `AAPL`, `NVDA`, `MSFT`, or `TSLA`.
 
-This project takes a stock ticker symbol and produces a structured investment research brief.
-
-The app gathers public company fundamentals, market data, and recent headlines, then uses an AI workflow to generate a research-style report with:
+The app then gathers public data, runs an AI research workflow, and returns a structured research brief containing:
 
 * Company name and ticker
 * Recommendation
@@ -22,18 +20,28 @@ The app gathers public company fundamentals, market data, and recent headlines, 
 * What to watch
 * Final verdict
 
-This project was built to demonstrate practical AI application development using Python, LangGraph, structured LLM outputs, financial data APIs, and Streamlit.
+## Why This Project Matters
+
+Many AI demos only send a prompt to a chatbot. This project goes further by combining multiple layers of a real AI application:
+
+* Data collection layer
+* AI workflow layer
+* Structured schema layer
+* Command-line interface
+* Streamlit web interface
+* Environment-variable protection for API keys
+* GitHub-ready documentation
 
 ## Features
 
 * Retrieves company fundamentals from SEC EDGAR
-* Retrieves market data from Yahoo Finance
-* Retrieves recent stock-related news headlines
-* Uses LangGraph to organize the AI workflow
-* Uses GPT-4o for structured financial analysis
-* Uses Pydantic schemas to control the output format
-* Includes a command-line interface
-* Includes a Streamlit web app
+* Retrieves stock market data from Yahoo Finance
+* Retrieves recent stock-related headlines
+* Uses LangGraph to organize the research workflow
+* Uses GPT-4o for structured analysis
+* Uses Pydantic to enforce clean output fields
+* Includes a terminal version through `main.py`
+* Includes a Streamlit web app through `app.py`
 
 ## Tech Stack
 
@@ -46,6 +54,7 @@ This project was built to demonstrate practical AI application development using
 * SEC EDGAR API
 * Streamlit
 * python-dotenv
+* Git / GitHub
 
 ## Project Structure
 
@@ -55,7 +64,7 @@ ai-stock-research-agent/
 ├── agent.py              # LangGraph workflow and AI analysis logic
 ├── app.py                # Streamlit web application
 ├── main.py               # Command-line interface
-├── schemas.py            # Pydantic structured output models
+├── schemas.py            # Pydantic models for structured output
 ├── tools.py              # SEC, Yahoo Finance, and news data tools
 ├── requirements.txt      # Python dependencies
 ├── .env.example          # Example environment variables
@@ -63,7 +72,7 @@ ai-stock-research-agent/
 └── README.md             # Project documentation
 ```
 
-## How It Works
+## Application Workflow
 
 ```text
 Ticker Input
@@ -72,7 +81,7 @@ Gather SEC fundamentals
    ↓
 Gather Yahoo Finance market data
    ↓
-Gather recent news headlines
+Gather recent headlines
    ↓
 Run LangGraph research workflow
    ↓
@@ -81,7 +90,7 @@ Generate structured GPT-4o research brief
 Display results in terminal or Streamlit app
 ```
 
-## Run Locally
+## How to Run Locally
 
 Clone the repository:
 
@@ -96,7 +105,7 @@ Create a virtual environment:
 python -m venv .venv
 ```
 
-Activate the environment on Windows:
+Activate the virtual environment on Windows:
 
 ```bash
 .venv\Scripts\activate
@@ -133,9 +142,9 @@ Then open:
 http://localhost:8501
 ```
 
-## Example Output
+## Example Output Sections
 
-The app returns a structured research brief with sections such as:
+The app returns a structured research brief with sections like:
 
 ```text
 TENSION POINT ANALYSIS
@@ -155,6 +164,7 @@ This project demonstrates:
 
 * Python project organization
 * API integration
+* Financial data collection
 * Environment variable management
 * SEC EDGAR data usage
 * Yahoo Finance data usage
@@ -163,7 +173,18 @@ This project demonstrates:
 * Pydantic structured outputs
 * Streamlit app development
 * Command-line app development
-* GitHub portfolio publishing
+* GitHub portfolio cleanup and documentation
+
+## Future Improvements
+
+Planned upgrades include:
+
+* Add a clean demo screenshot or GIF
+* Add ticker validation
+* Add historical price charts
+* Add export-to-PDF functionality
+* Add a deployed Streamlit Cloud version
+* Add unit tests for the data tools
 
 ## Important Disclaimer
 
